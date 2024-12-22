@@ -1,0 +1,33 @@
+---
+# tasks file for mysql_db
+    - name: Install SQL sever and client
+      apt: name={{item}} state=present
+      with_items:
+        - mysql-server
+        - mysql-client
+    - name: Install Python MySQL client library
+      pip:
+        name: pymysql
+        state: present
+        executable: pip3
+    
+    - name: Start SQL sever 
+      service: 
+        name: mysql
+        state: started
+        enabled: yes
+   
+    - name: Create application database
+      community.mysql.mysql_db: 
+        name: "{{db_name}}" 
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+   
+    - name: Create database user
+      community.mysql.mysql_user:   
+        name: "{{db_user}}"
+        password: "{{db_user_password}}"
+        priv: '*.*:ALL'
+        state: present
+        host: '%'  
+        login_unix_socket: /var/run/mysqld/mysqld.sock 
